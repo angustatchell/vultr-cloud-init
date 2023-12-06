@@ -1,0 +1,54 @@
+#cloud-config
+
+# Ensure the package manager is up to date and install necessary packages
+package_update: true
+packages:
+  - zsh
+  - curl
+  - iputils
+
+  - git
+  - docker
+
+
+# Run commands to set up the environment
+runcmd:
+  
+  # --- --- --- SHELL SETUP --- --- ---
+  
+  # Install Oh My Zsh
+  - sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+  # Wait to ensure Zsh is installed
+  - sleep 10
+
+  # Change the default shell to zsh for the root user
+  - chsh -s $(which zsh)
+
+  # Verification step (optional)
+  - grep 'root' /etc/passwd
+
+  # Setup custom .zshrc
+  - curl -o /root/.zshrc https://raw.githubusercontent.com/angustatchell/vultr-cloud-init/main/zshrc/minimal/.zshrc
+
+
+  # --- --- --- SSHD CONFIG --- --- ---
+
+  # Backup the original sshd_config file
+  - cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
+  
+  # Downloading and replacing sshd_config
+  - curl -o /etc/ssh/sshd_config https://raw.githubusercontent.com/angustatchell/vultr-cloud-init/main/ssh/sshd/sshd_config
+
+  # Set the correct permissions and ownership
+  - chmod 600 /etc/ssh/sshd_config
+  - chown root:root /etc/ssh/sshd_config
+
+  # Restart SSH service to apply new configuration
+  - rc-service sshd restart
+
+  # --- --- --- MOTD CONFIG --- --- ---
+  - curl -o /etc/profile.d/motd-sysinfo.sh 
+
+# Final message on complete
+final_message: "CLOUD-INIT USER CONFIG COMPLETE"
