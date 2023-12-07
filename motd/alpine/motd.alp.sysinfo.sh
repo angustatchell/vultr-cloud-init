@@ -1,11 +1,11 @@
 #!/bin/sh
 
 echo " "
-echo ". [ ———————————— SYSTEM LOAD ———————————— ]"
+echo "[ ———————— SYSTEM LOAD —————————— ]"
 echo "$(uptime)"
 
 echo " "
-echo ". [ ———————————— CPU INFO ——————————————— ]"
+echo "[ ———————— CPU INFO ————————————— ]"
 cpu_info=$(cat /proc/cpuinfo) # assuming cpu_info is populated like this
 
 # Extracting specific fields
@@ -33,11 +33,11 @@ printf "%-20s %s\n" "Cache Size:"      "$cache_size"
 printf "%-20s %s\n" "Address Sizes:"   "$address_sizes"
 
 echo " "
-echo "[ ———————————— MEMORY USAGE ———————————— ]"
+echo "[ ———————— MEMORY USAGE ————————— ]"
 echo "$(free -h)"
 
 echo " "
-echo "[ ———————————— DISK USAGE —————————————— ]"
+echo "[ ———————— DISK USAGE ——————————— ]"
 echo "$(df -h)"
 echo " "
 echo " "
