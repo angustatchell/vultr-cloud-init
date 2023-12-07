@@ -25,10 +25,6 @@ runcmd:
   - echo '[ --> INSTALLING OH_MY_ZSH... ]'
   - sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-  # # Wait to ensure Zsh is installed
-  # - echo '[ --> SLEEPING 10 FOR OMZ INSTALL... ]'
-  # - sleep 10
-
   # Change the default shell to zsh for the root user
   - echo '[ --> CHANGING ROOT SHELL... ]'
   # - chsh -s $(which zsh)
