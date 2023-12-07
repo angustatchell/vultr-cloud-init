@@ -1,11 +1,11 @@
 #!/bin/sh
 
-echo "\n"
-echo "[ ----------- System Load ----------- ]"
+echo " "
+echo "[ ———————————— System Load ———————————— ]"
 echo "$(uptime)"
 
-echo "\n"
-echo "[ ------------- CPU Info ------------- ]"
+echo " "
+echo "[ ———————————— CPU Info ———————————— ]"
 cpu_info=$(cat /proc/cpuinfo) # assuming cpu_info is populated like this
 
 # Extracting specific fields
@@ -32,14 +32,14 @@ printf "%-20s %s\n" "CPU MHz:" "$cpu_mhz"
 printf "%-20s %s\n" "Cache Size:" "$cache_size"
 printf "%-20s %s\n" "Address Sizes:" "$address_sizes"
 
-echo "\n"
-echo "[ ----------- Memory Usage ----------- ]"
+echo " "
+echo "[ ———————————— Memory Usage ———————————— ]"
 echo "$(free -h)"
 
-echo "\n"
-echo "[ ----------- Disk Usage ----------- ]"
+echo " "
+echo "[ ———————————— Disk Usage ———————————— ]"
 echo "$(df -h)"
-echo "\n"
+echo " "
 
 # Check for the existence of necessary commands
 # if command -v uptime > /dev/null && command -v free > /dev/null && command -v df > /dev/null; then
