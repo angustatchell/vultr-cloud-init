@@ -1,0 +1,64 @@
+#!/bin/bash
+
+echo '[ >>> STARTING SETUP SCRIPT <<< ]'
+
+# --------- SHELL SETUP ---------
+echo '[ ->> STARTING SHELL SETUP <<- ]'
+
+# Install Oh My Zsh
+echo '[ --> INSTALLING OH_MY_ZSH... ]'
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# Change the default shell to zsh for the root user
+echo '[ --> CHANGING ROOT SHELL... ]'
+sed -i 's|/root:/bin/ash|/root:/bin/zsh|' /etc/passwd
+
+# Verification step (optional)
+echo '[ --> VERIFYING ROOT in /etc/passwd ... ]'
+grep 'root' /etc/passwd
+
+# Setup custom .zshrc
+echo '[ --> DOWNLOADING CUSTOM .ZSHRC ]'
+curl -o /root/.zshrc https://raw.githubusercontent.com/angustatchell/vultr-cloud-init/main/zshrc/minimal/.zshrc
+
+echo '[ ->> COMPLETED SHELL SETUP <<- ]'
+
+# --------- SSHD CONFIG ---------
+
+echo '[ ->> STARTING SSHD CONFIGURATION <<- ]'
+
+# Backup the original sshd_config file
+echo '[ --> BACKING UP ORIGINAL SSHD_CONFIG ]'
+cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
+
+# Downloading and replacing sshd_config
+echo '[ --> DOWNLOADING AND REPLACING SSHD_CONFIG ]'
+curl -o /etc/ssh/sshd_config https://raw.githubusercontent.com/angustatchell/vultr-cloud-init/main/ssh/sshd/sshd_config
+
+# Set the correct permissions and ownership
+echo '[ --> CHANGING SSHD_CONFIG OWNERSHIP ]'
+chmod 600 /etc/ssh/sshd_config
+chown root:root /etc/ssh/sshd_config
+
+# Restart SSH service to apply new configuration
+echo '[ --> RESTARTING SSH SERVICE ]'
+rc-service sshd restart
+
+echo '[ ->> COMPLETED SSHD CONFIGURATION <<- ]'
+
+# --------- MOTD CONFIG ---------
+echo '[ ->> STARTING MOTD CONFIGURATION <<- ]'
+
+echo '[ --> BACKING UP OLD MOTD... ]'
+cp /etc/motd /etc/motd.backup
+
+echo '[ --> REPLACING OLD MOTD... ]'
+curl -o /etc/motd https://raw.githubusercontent.com/angustatchell/vultr-cloud-init/main/motd/alpine/motd
+
+echo '[ --> DOWNLOADING MOTD SYSINFO.SH... ]'
+curl -o /etc/profile.d/motd-sysinfo.sh https://raw.githubusercontent.com/angustatchell/vultr-cloud-init/main/motd/alpine/motd.alp.sysinfo.sh
+chmod +x /etc/profile.d/motd-sysinfo.sh
+
+echo '[ <<< COMPLETED MOTD CONFIGURATION >>> ]'
+
+echo '[ >>> SETUP SCRIPT COMPLETE <<< ]'
