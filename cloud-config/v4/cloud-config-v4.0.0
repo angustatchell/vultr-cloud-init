@@ -1,1 +1,14 @@
+#cloud-config
 
+# Ensure the package manager is up to date and install necessary packages
+package_update: true
+packages:
+  - zsh
+  - curl
+  - iputils
+  - git
+  - docker
+
+runcmd:
+  - echo '[ >>> STARTING CLOUD-CONFIG RUNCMD <<< ]'
+  - sh -c "$(curl -fsSL https://raw.githubusercontent.com/angustatchell/vultr-cloud-init/main/cloud-config/v4/setup.sh)"
