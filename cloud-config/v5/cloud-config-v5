@@ -1,0 +1,74 @@
+#cloud-config
+
+package_update: true
+packages:
+  - zsh
+  - curl
+  - iputils
+  - git
+  - docker
+  - docker-cli-compose
+  - bash
+  - ca-certificates
+  - chrony
+  - nftables
+  - tzdata
+  - shadow   # for usermod/usermod-like tools on Alpine
+
+timezone: Europe/London
+
+users:
+  - name: dev
+    gecos: Dev User
+    groups: wheel,docker
+    shell: /bin/zsh
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAA...REPLACE_WITH_YOUR_PUBLIC_KEY... user@laptop
+
+write_files:
+  - path: /etc/nftables.conf
+    permissions: "0644"
+    owner: root:root
+    content: |
+      # nftables basic firewall
+      table inet filter {
+        chain input {
+          type filter hook input priority 0;
+          ct state established,related accept
+          iif lo accept
+          tcp dport { 22, 80, 443 } accept
+          ip protocol icmp accept
+          ip6 nexthdr icmpv6 accept
+          counter drop
+        }
+        chain forward { type filter hook forward priority 0; drop; }
+        chain output { type filter hook output priority 0; accept; }
+      }
+
+runcmd:
+  - echo '[ >>> STARTING CLOUD-CONFIG RUNCMD <<< ]'
+
+  # Enable and start core services
+  - rc-update add docker boot
+  - rc-update add nftables boot
+  - rc-update add chronyd boot
+  - rc-service docker start
+  - rc-service nftables start
+  - rc-service chronyd start
+
+  # Ensure dev user is in docker group (idempotent)
+  - addgroup -S docker || true
+  - adduser dev docker || true
+
+  # Prepare common directories
+  - mkdir -p /srv/app /opt/envs
+  - chown -R dev:dev /srv/app /opt/envs
+
+  # Optional: auto-clone your private repo into /srv/app (requires SSH key to work)
+  # - sudo -u dev git clone git@github.com:YOURORG/YOURREPO.git /srv/app
+
+  # Your existing remote setup script (kept)
+  - sh -c "$(curl -fsSL https://raw.githubusercontent.com/angustatchell/vultr-cloud-init/main/cloud-config/v4/setup.sh)"
+
+  - echo '[ >>> CLOUD-CONFIG COMPLETE <<< ]'
